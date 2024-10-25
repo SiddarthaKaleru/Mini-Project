@@ -1,0 +1,7 @@
+.homePage{
+    margin: 3rem;
+}
+.allCards{
+    display: flex;
+    flex-wrap: wrap;
+}
