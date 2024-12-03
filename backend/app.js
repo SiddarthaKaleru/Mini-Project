@@ -11,7 +11,7 @@ const bodyParser = require('body-parser');
 const profileRouter=require('./Routes/profile')
 const app=express();
 const port=8080;
-mongoose.connect("mongodb+srv://gajanang:UU81dsa1f6Mvhs0R@cluster0.d8rlb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0").then(()=>{
+mongoose.connect(process.env.MONGO_URI).then(()=>{
     console.log("Connected to DB")
 });
 
@@ -21,7 +21,7 @@ app.use(session({
   resave: false,                           
   saveUninitialized: false,                
   store: mongoStore.create({
-    mongoUrl: 'mongodb+srv://gajanang:UU81dsa1f6Mvhs0R@cluster0.d8rlb.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    mongoUrl: process.env.MONGO_URI,
     collectionName: 'sessions'
   }),
   cookie: { 
