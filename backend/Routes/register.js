@@ -64,6 +64,46 @@ router.post('/',upload.single('image'), async (req, res) => {
 });
 
 
+router.patch('/:id', upload.single('image'), async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Prepare the updated fields object
+    const updatedFields = {};
+
+    // Loop through request body and add non-null fields to updatedFields
+    Object.keys(req.body).forEach((key) => {
+      if (req.body[key] !== undefined && req.body[key] !== '') {
+        updatedFields[key] = req.body[key];
+      }
+    });
+
+    // If a file is uploaded, add the file path to the updatedFields
+    if (req.file) {
+      updatedFields.image = req.file.path; // Assuming you're saving the file path
+    }
+
+    // Use findByIdAndUpdate to update the listing
+    const updatedListing = await Listing.findByIdAndUpdate(id, updatedFields, {
+      new: true, // Return the updated document
+      runValidators: true, // Validate before updating
+    });
+
+    if (!updatedListing) {
+      return res.status(404).json({ message: 'Listing not found' });
+    }
+    return res.status(200).json({
+      message: 'Listing updated successfully!',
+      data: updatedListing,
+    });
+  } catch (error) {
+    console.error('Error updating listing:', error);
+    return res.status(500).json({ message: 'Server error' });
+  }
+});
+
+
+
 router.get('/', async (req, res) => {
   try {
     const listings = await Listing.find(); 

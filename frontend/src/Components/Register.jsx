@@ -3,6 +3,8 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Register.css';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { ToastContainer, toast } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css'; 
 
 const MultiStepForm = () => {
   const [step, setStep] = useState(1);
@@ -83,16 +85,19 @@ const MultiStepForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const prevStep = () => {
+    setStep(step - 1);
+    toast.success('Moved to Previous step!');
+  };
+
+
   const nextStep = () => {
     if (validateStep()) {
       setStep(step + 1);
+      toast.success('Moved to next step!');
     }
   };
-
-  const prevStep = () => {
-    setStep(step - 1);
-  };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -100,23 +105,25 @@ const MultiStepForm = () => {
   
     let id = window.localStorage.getItem('id');
     if (id) {
-      formData.id=id;
+      formData.id = id;
     }
     for (const key in formData) {
       formDataToSend.append(key, formData[key]);
     }
+  
     try {
       const response = await axios.post("http://localhost:8080/register", formDataToSend, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      navigate('/details')
+      toast.success('Registration successful!');
+      navigate('/details');
     } catch (error) {
       console.error(error);
+      toast.error('An error occurred. Please try again.');
     }
-};
-
+  };
   
 
   return (
@@ -131,6 +138,7 @@ const MultiStepForm = () => {
     >
       <div className='border-dark border-4' style={{padding:'3rem'}}>
         <form onSubmit={handleSubmit} encType="multipart/form-data" method='post'>
+          {/* Step Content */}
           {step === 1 && (
             <div>
               <h3>Basic Information</h3>
@@ -172,7 +180,7 @@ const MultiStepForm = () => {
               <button className='btn btn-dark mr-3' type="button" onClick={nextStep}>Next</button>
             </div>
           )}
-
+          
           {step === 2 && (
             <div>
               <h3>Academic Information</h3>
@@ -205,7 +213,7 @@ const MultiStepForm = () => {
               </div>
 
               <div className="inputitem">
-                <label>Project/Thesis Title</label>
+                <label>Projeact/Thesis Title</label>
                 <br/>
                 <input className='form-control' type="text" name="projectTitle" value={formData.projectTitle} onChange={handleChange} placeholder="Enter project title" />
               </div>
@@ -313,6 +321,7 @@ const MultiStepForm = () => {
       )}
     </form>
   </div>
+  <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
 </div>
 
   );

@@ -1,43 +1,212 @@
-import React, { useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
-import { Container, Row, Col, Card, Image} from 'react-bootstrap';
+import { Container, Row, Col, Card, Image } from 'react-bootstrap';
 
 const Edit = () => {
-    const navigate=useNavigate();
-    let {id}=useParams();
-    const [user, setUser] = useState(null);
-    useEffect(() => {
-      const fetchProfile = async () => {
-        try {
-          const response = await axios.get(`http://localhost:8080/register/${id}`);
-          console.log(response.data)
-          setUser(response.data);
-        } catch (error) {
-          console.error("Error fetching profile data:", error);
-        }
-      };
-      fetchProfile();
-    }, [id]);
-    if (!user) {
-      return <div>Loading...</div>;
+  const navigate = useNavigate();
+  const { id } = useParams();
+
+  const [formData, setFormData] = useState({
+    fullName: '',
+    rollNumber: '',
+    batchYear: '',
+    program: '',
+    department: '',
+    email: '',
+    phone: '',
+    gpa: '',
+    graduationYear: '',
+    projectTitle: '',
+    internships: '',
+    dateOfBirth: '',
+    address: '',
+    hobbies: '',
+    linkedIn: '',
+    clubs: '',
+    achievements: '',
+    sports: '',
+    personalStatement: '',
+    favoriteMemory: '',
+    futurePlans: '',
+    image: null,
+  });
+
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/register/${id}`);
+        setFormData(response.data);
+      } catch (error) {
+        console.error('Error fetching profile data:', error);
+      }
+    };
+    fetchProfile();
+  }, [id]);
+
+  const handleChange = (e) => {
+    const { name, value, files } = e.target;
+    setFormData({
+      ...formData,
+      [name]: files ? files[0] : value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    const formDataToSend = new FormData();
+    for (const key in formData) {
+      if (formData[key]) {
+        formDataToSend.append(key, formData[key]);
+      }
     }
+  
+    try {
+      const response = await axios.patch(`http://localhost:8080/register/${id}`, formDataToSend, {
+        headers: {
+          'Content-Type': 'multipart/form-data', // Specify content type as multipart
+        },
+      });
+  
+      if (response.status === 200) {
+        navigate(`/profile/${id}`); // Redirect after successful update
+      }
+    } catch (error) {
+      console.error('Error submitting form data:', error);
+    }
+  };
+  
+  
 
+  return (
+    <div
+      className='pt-4 d-flex justify-content-center align-item-center'
+      style={{
+        height: '100vh',
+        paddingBottom: '5rem',
+        marginTop: '-1rem',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        
+      }}
+    >
+      <div className='border-dark border-4' style={{ padding: '3rem' }}>
+        <form onSubmit={handleSubmit} encType='multipart/form-data'>
+          <div>
+            <h3>Basic Information</h3>
+            {['fullName', 'rollNumber', 'batchYear', 'program', 'department'].map((field) => (
+              <div className='inputitem' key={field}>
+                <label>{field.replace(/([A-Z])/g, ' $1')}</label>
+                <br />
+                <input
+                  className='form-control'
+                  type='text'
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                />
+                {errors[field] && <p className='error'>{errors[field]}</p>}
+              </div>
+            ))}
+          </div>
 
-    return (
-        <Container className="mt-5">
-        <Row className="justify-item-center align-item-center">
-            <Col>
-            <Card className="ml-150 text-center shadow-lg p-3  bg-white rounded h-100 w-100">
-                <Card.Body>
-                </Card.Body>
-                <span style={{display:'flex', flexDirection:'row', justifyContent:'space-evenly'}}>
-                    <button className='btn btn-danger w-25' onClick={handleDelete}>Delete</button>
-                    <button className='btn btn-primary w-25'>Edit</button>
-                </span>
-            </Card>
-            </Col>
-        </Row>
-        </Container>
-    )};
+          <div>
+            <h3>Academic Information</h3>
+            {['email', 'phone', 'gpa', 'graduationYear', 'projectTitle', 'internships'].map((field) => (
+              <div className='inputitem' key={field}>
+                <label>{field.replace(/([A-Z])/g, ' $1')}</label>
+                <br />
+                <input
+                  className='form-control'
+                  type={field === 'email' ? 'email' : 'text'}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                />
+                {errors[field] && <p className='error'>{errors[field]}</p>}
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <h3>Personal Information</h3>
+            {['dateOfBirth', 'address', 'hobbies', 'linkedIn'].map((field) => (
+              <div className='inputitem' key={field}>
+                <label>{field.replace(/([A-Z])/g, ' $1')}</label>
+                <br />
+                <input
+                  className='form-control'
+                  type={field === 'dateOfBirth' ? 'date' : 'text'}
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                />
+                {errors[field] && <p className='error'>{errors[field]}</p>}
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <h3>Extracurricular Information</h3>
+            {['clubs', 'achievements', 'sports'].map((field) => (
+              <div className='inputitem' key={field}>
+                <label>{field.replace(/([A-Z])/g, ' $1')}</label>
+                <br />
+                <input
+                  className='form-control'
+                  type='text'
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                />
+                {errors[field] && <p className='error'>{errors[field]}</p>}
+              </div>
+            ))}
+          </div>
+
+          <div>
+            <h3>Additional Information</h3>
+            {['personalStatement', 'favoriteMemory', 'futurePlans'].map((field) => (
+              <div className='inputitem' key={field}>
+                <label>{field.replace(/([A-Z])/g, ' $1')}</label>
+                <br />
+                <textarea
+                  className='form-control'
+                  name={field}
+                  value={formData[field]}
+                  onChange={handleChange}
+                  placeholder={`Enter ${field.replace(/([A-Z])/g, ' $1').toLowerCase()}`}
+                />
+                {errors[field] && <p className='error'>{errors[field]}</p>}
+              </div>
+            ))}
+
+            {/* <div className='inputitem'>
+              <label>Image</label>
+              <br />
+              <input
+                className='form-control'
+                type='file'
+                name='image'
+                onChange={(e) => setFormData({ ...formData, image: e.target.files[0] })}
+              />
+            </div> */}
+          </div>
+
+          <button className='btn btn-dark mr-3' type='submit' onClick={handleSubmit}>
+            Submit
+          </button>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default Edit;

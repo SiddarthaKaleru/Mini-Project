@@ -1,5 +1,5 @@
 import React, { useEffect, useState} from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { Container, Row, Col, Card, Image} from 'react-bootstrap';
 const Profile = () => {
@@ -32,13 +32,13 @@ const Profile = () => {
       console.log(e);
     }
   }
-  const handleEdit=()=>{
-    try {
-      
-    } catch (error) {
-      console.log(error);
-    }
-  }
+  // const handleEdit=()=>{
+  //   try {
+  //     const res=axios.get()
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // }
 
   return (
     <Container className="mt-5">
@@ -87,7 +87,12 @@ const Profile = () => {
                }
                {
                 user.user===currentUserId &&
-                <button className='btn btn-primary w-25'>Edit</button>
+                <Link to={`/profile/${id}/edit`} className="btn btn-primary w-25">
+                  <button style={{
+                      all: "unset",
+                      cursor: "pointer"
+                  }}>Edit</button>
+                </Link>
                }
             </span>
            
